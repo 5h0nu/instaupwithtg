@@ -1,8 +1,6 @@
-python-telegram-bot>=21.0
-instagrapi==2.1.1
-moviepy>=1.0.3
-pydantic>=2.6.4,<2.11.0
-pillow>=11.0.0
-httpx>=0.27.0
-requests>=2.25.1
-PySocks==1.7.1
+python-telegram-bot
+instagrapi
+moviepy
+pydantic
+pillow
+httpx
