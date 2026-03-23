@@ -84,14 +84,26 @@ async def manage_session(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def save_session(update: Update, context: ContextTypes.DEFAULT_TYPE):
     session_id = update.message.text.strip()
     cl = Client()
+    # Adding a common User-Agent helps avoid immediate blocks
+    cl.set_user_agent("Instagram 219.0.0.12.117 Android") 
+    
     msg = await update.message.reply_text("⏳ Verifying session... please wait.")
     try:
+        # Pass the session_id directly into the settings
+        cl.set_settings({"sessionid": session_id})
         cl.login_by_sessionid(session_id)
-        user_sessions[update.message.from_user.id] = {"cl": cl, "username": cl.account_info().username}
-        await msg.edit_text(f"✅ Success! Logged in as: **@{user_sessions[update.message.from_user.id]['username']}**")
+        
+        # Verify the login worked
+        user_data = cl.account_info().dict()
+        user_sessions[update.message.from_user.id] = {"cl": cl, "username": user_data['username']}
+        
+        await msg.edit_text(f"✅ Success! Logged in as: **@{user_data['username']}**")
     except Exception as e:
-        await msg.edit_text(f"❌ Login Failed: {str(e)}")
-    return await start(update, context)# --- REEL UPLOAD FLOW ---
+        logging.error(f"Login error: {e}")
+        await msg.edit_text(f"❌ Login Failed: The Session ID might be invalid or your IP is blocked.")
+    
+    return await start(update, context)
+# --- REEL UPLOAD FLOW ---
 async def ask_reel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.edit_message_text("Please upload the **MP4 Video** file:")
     return ASKING_REEL
